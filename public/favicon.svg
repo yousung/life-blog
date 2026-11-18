@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="방송 건강노트">
+  <rect width="64" height="64" rx="16" fill="#1f7a4d"/>
+  <path d="M32 50S14 39.5 14 26.5C14 20 18.7 15 24.6 15c3.4 0 5.9 1.7 7.4 4.1C33.5 16.7 36 15 39.4 15 45.3 15 50 20 50 26.5 50 39.5 32 50 32 50z" fill="#fff"/>
+  <path d="M19 31h8l3-6 4 11 3-5h8" fill="none" stroke="#1f7a4d" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

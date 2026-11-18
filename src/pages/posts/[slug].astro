@@ -1,0 +1,140 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import PostCard from '../../components/PostCard.astro';
+import { CATEGORY_LABELS, AD_SLOTS, HEALTH_DISCLAIMER, SITE_URL } from '../../consts';
+import { getPublishedPosts } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const published = getPublishedPosts(await getCollection('posts'));
+  return published.map((post) => ({
+    params: { slug: post.data.slug },
+    props: {
+      post,
+      related: published
+        .filter((other) => other.id !== post.id)
+        .map((other) => ({
+          other,
+          score:
+            (other.data.category === post.data.category ? 3 : 0) +
+            other.data.tags.filter((tag) => post.data.tags.includes(tag)).length +
+            (other.data.program === post.data.program ? 1 : 0)
+        }))
+        .filter((item) => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map((item) => item.other)
+    }
+  }));
+}
+
+const { post, related } = Astro.props;
+const { Content, headings } = await render(post);
+const data = post.data;
+const fmt = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'long' });
+const published = data.date.toISOString();
+const modified = (data.updatedDate ?? data.date).toISOString();
+const toc = headings.filter((h) => h.depth === 2);
+const pageUrl = new URL(Astro.url.pathname, Astro.site ?? SITE_URL).href;
+const faqJsonLd =
+  data.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: data.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a }
+        }))
+      }
+    : undefined;
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '홈', item: new URL('/', Astro.site ?? SITE_URL).href },
+    { '@type': 'ListItem', position: 2, name: CATEGORY_LABELS[data.category], item: new URL(`/categories/${data.category}/`, Astro.site ?? SITE_URL).href },
+    { '@type': 'ListItem', position: 3, name: data.title, item: pageUrl }
+  ]
+};
+const extraJsonLd = faqJsonLd ? [breadcrumbJsonLd, faqJsonLd] : [breadcrumbJsonLd];
+---
+
+<BaseLayout title={data.title} description={data.description} type="article" publishedTime={published} modifiedTime={modified} tags={data.tags} image={data.image} extraJsonLd={extraJsonLd}>
+  <article class="article">
+    <header class="article-header">
+      <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="/">홈</a> › <a href={`/categories/${data.category}/`}>{CATEGORY_LABELS[data.category]}</a>
+      </nav>
+      <h1>{data.title}</h1>
+      <p class="lead">{data.description}</p>
+      <dl class="broadcast-info">
+        <div><dt>방송</dt><dd>{data.broadcaster ? `${data.broadcaster} ` : ''}{data.program}{data.episode ? ` ${data.episode}` : ''}</dd></div>
+        {data.broadcastDate && <div><dt>방송일</dt><dd><time datetime={data.broadcastDate.toISOString()}>{fmt.format(data.broadcastDate)}</time></dd></div>}
+        {data.experts.length > 0 && <div><dt>출연 전문가</dt><dd>{data.experts.join(', ')}</dd></div>}
+        <div><dt>{data.updatedDate ? '고친 날' : '쓴 날'}</dt><dd><time datetime={modified}>{fmt.format(data.updatedDate ?? data.date)}</time></dd></div>
+      </dl>
+      {data.image && (
+        <figure class="article-hero-image">
+          <img src={data.image} alt={data.imageAlt ?? data.title} loading="eager" decoding="async" />
+          {data.imageAlt && <figcaption>{data.imageAlt}</figcaption>}
+        </figure>
+      )}
+    </header>
+
+    {data.summary.length > 0 && (
+      <section class="summary-box" aria-labelledby="summary-title">
+        <h2 id="summary-title">한눈에 보기</h2>
+        <ul>{data.summary.map((line) => <li>{line}</li>)}</ul>
+      </section>
+    )}
+
+    <AdSlot slot={AD_SLOTS.postTopDisplay} variant="display" />
+
+    {toc.length >= 3 && (
+      <nav class="toc" aria-labelledby="toc-title">
+        <h2 id="toc-title">목차</h2>
+        <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+      </nav>
+    )}
+
+    <div class="article-body">
+      <Content />
+    </div>
+    <AdSlot slot={AD_SLOTS.postInArticle} variant="in-article" beforeHeading={3} />
+
+    {data.faq.length > 0 && (
+      <section class="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">자주 묻는 질문</h2>
+        {data.faq.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </section>
+    )}
+
+    <aside class="notice notice--health" role="note">
+      <strong>꼭 읽어 주세요</strong>
+      <p>{HEALTH_DISCLAIMER}</p>
+    </aside>
+
+    {data.source.length > 0 && (
+      <section class="article-sources">
+        <h2>출처 및 확인 자료</h2>
+        <ul>{data.source.map((item) => <li>{item}</li>)}</ul>
+      </section>
+    )}
+
+    {related.length > 0 && (
+      <section class="related" aria-labelledby="related-title">
+        <h2 id="related-title">함께 보면 좋은 글</h2>
+        <div class="grid two">{related.map((item) => <PostCard post={item} compact />)}</div>
+      </section>
+    )}
+
+    <AdSlot slot={AD_SLOTS.postMultiplex} variant="multiplex" />
+  </article>
+</BaseLayout>

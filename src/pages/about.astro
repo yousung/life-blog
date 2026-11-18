@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE, HEALTH_DISCLAIMER } from '../consts';
+---
+
+<BaseLayout title="사이트 소개" description={`${SITE_TITLE}는 TV 건강 프로그램 내용을 50대 이후 독자가 읽기 쉽게 정리하는 블로그입니다. 작성 원칙과 출처 기준을 안내합니다.`}>
+  <article class="article">
+    <header class="article-header">
+      <h1>{SITE_TITLE} 소개</h1>
+      <p class="lead">바쁘거나 놓친 TV 건강 방송을, 큰 글씨로 핵심만 다시 볼 수 있게 정리합니다.</p>
+    </header>
+    <div class="article-body">
+      <h2>무엇을 정리하나요</h2>
+      <p>KBS·MBC·SBS·종합편성채널 등에서 방송한 건강 프로그램이 다룬 주제(혈압, 혈당, 관절, 뇌 건강, 수면, 식단, 운동 등)를 방송 흐름에 맞춰 요약합니다. 방송 대본을 옮겨 적지 않고, 방송에서 강조한 핵심과 실천 방법을 다시 정리합니다.</p>
+      <h2>어떻게 확인하나요</h2>
+      <ul>
+        <li>방송사 공식 홈페이지의 회차 소개와 공식 영상으로 방송 내용을 확인합니다.</li>
+        <li>수치·기준(혈압, 혈당, 권장량 등)은 질병관리청, 국가건강정보포털, 대한의학회 산하 학회 같은 공신력 있는 기관 자료와 대조합니다.</li>
+        <li>글마다 방송 정보와 출처를 밝히고, 내용이 바뀌면 고친 날짜를 함께 적습니다.</li>
+      </ul>
+      <h2>지키는 원칙</h2>
+      <ul>
+        <li>특정 음식이나 제품이 병을 낫게 한다고 단정하지 않습니다.</li>
+        <li>약을 끊거나 바꾸라고 권하지 않습니다.</li>
+        <li>광고·제휴 링크가 있으면 글에 분명히 표시합니다.</li>
+      </ul>
+      <h2>주의</h2>
+      <p>{HEALTH_DISCLAIMER}</p>
+      <h2>정정·문의</h2>
+      <p>잘못된 내용이나 삭제 요청은 사이트 운영자에게 알려 주시면 확인 후 고치겠습니다.</p>
+    </div>
+  </article>
+</BaseLayout>

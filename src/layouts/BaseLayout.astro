@@ -1,0 +1,175 @@
+---
+import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE, SITE_URL, NAV_ITEMS, ADSENSE_CLIENT, GA_MEASUREMENT_ID, NAVER_ANALYTICS_ID, NAVER_SITE_VERIFICATION } from '../consts';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  noindex?: boolean;
+  /** 페이지별로 추가할 JSON-LD (예: FAQPage) */
+  extraJsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = SITE_TITLE,
+  description = SITE_DESCRIPTION,
+  image = '/og-default.svg',
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  tags = [],
+  noindex = false,
+  extraJsonLd
+} = Astro.props as Props;
+
+const site = Astro.site ?? new URL(SITE_URL);
+const canonical = new URL(Astro.url.pathname, site);
+const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
+const imageUrl = new URL(image, site);
+const robots = noindex ? 'noindex, follow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+const jsonLd = type === 'article'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      url: canonical.href,
+      inLanguage: 'ko-KR',
+      isPartOf: { '@type': 'Blog', name: SITE_TITLE, url: site.href },
+      author: { '@type': 'Person', name: SITE_AUTHOR, url: new URL('/about/', site).href },
+      publisher: { '@type': 'Organization', name: SITE_TITLE, url: site.href },
+      datePublished: publishedTime,
+      dateModified: modifiedTime ?? publishedTime,
+      keywords: tags.join(', '),
+      image: imageUrl.href
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      url: site.href,
+      inLanguage: 'ko-KR',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${site.href}search/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string'
+      }
+    };
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    {NAVER_SITE_VERIFICATION && <meta name="naver-site-verification" content={NAVER_SITE_VERIFICATION} />}
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#f0fdf4" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" href={new URL('/rss.xml', site).href} title={`${SITE_TITLE} RSS`} />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:title" content={type === 'article' ? title : pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={imageUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={type === 'article' ? title : pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl.href} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {tags.map((tag) => <meta property="article:tag" content={tag} />)}
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    {(Array.isArray(extraJsonLd) ? extraJsonLd : extraJsonLd ? [extraJsonLd] : []).map((ld) => <script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />)}
+    {GA_MEASUREMENT_ID && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>}
+    {GA_MEASUREMENT_ID && (
+      <script is:inline define:vars={{ gaId: GA_MEASUREMENT_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', gaId);
+      </script>
+    )}
+    <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`} crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
+    <header class="site-header">
+      <div class="shell nav-shell">
+        <a class="brand" href="/" aria-label={`${SITE_TITLE} 홈`}>
+          <span class="brand-mark" aria-hidden="true">건강</span>
+          <span><strong>{SITE_TITLE}</strong><small>TV 건강 방송 쉽게 정리</small></span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="visually-hidden">메뉴</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+        <nav class="site-nav" id="site-nav" aria-label="주요 메뉴">
+          {NAV_ITEMS.map((item) => <a href={item.href}>{item.label}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" class="shell">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <div>
+          <strong>{SITE_TITLE}</strong>
+          <p>TV 건강 프로그램 내용을 공식 방송 정보와 공신력 있는 의료 기관 자료로 확인해 정리합니다. 이 사이트의 정보는 진료를 대신하지 않습니다.</p>
+        </div>
+        <nav aria-label="푸터 메뉴">
+          <a href="/about/">사이트 소개</a>
+          <a href="/privacy/">개인정보처리방침</a>
+          <a href="/rss.xml">RSS</a>
+          <a href="/search/">검색</a>
+        </nav>
+      </div>
+    </footer>
+    <script>
+      const toggle = document.querySelector('.nav-toggle');
+      const nav = document.querySelector('.site-nav');
+      toggle?.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        nav?.classList.toggle('is-open', open);
+      });
+    </script>
+    {NAVER_ANALYTICS_ID && <script is:inline define:vars={{ naId: NAVER_ANALYTICS_ID }}>
+      // Naver Analytics: load on first user interaction (same pattern as blog.lovizu.com; keeps wcs console errors out of page load).
+      (function () {
+        var loaded = false;
+        var events = ['scroll', 'pointerdown', 'keydown', 'touchstart'];
+        function load() {
+          if (loaded) return;
+          loaded = true;
+          events.forEach(function (e) { window.removeEventListener(e, load, { passive: true }); });
+          window.wcs_add = window.wcs_add || {};
+          window.wcs_add['wa'] = naId;
+          var s = document.createElement('script');
+          s.src = 'https://wcs.pstatic.net/wcslog.js';
+          s.async = true;
+          s.onload = function () { if (window.wcs) window.wcs_do(); };
+          document.body.appendChild(s);
+        }
+        events.forEach(function (e) { window.addEventListener(e, load, { passive: true, once: true }); });
+      })();
+    </script>}
+  </body>
+</html>

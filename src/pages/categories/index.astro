@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CATEGORY_LABELS, CATEGORY_DESCRIPTIONS } from '../../consts';
+
+const categories = Object.entries(CATEGORY_LABELS);
+---
+
+<BaseLayout title="증상·주제별 보기" description="혈압, 혈당, 관절, 뇌 건강, 수면 등 증상과 주제별로 TV 건강 방송 정리 글을 모았습니다.">
+  <section class="article-header">
+        <h1>증상·주제별 보기</h1>
+    <p class="lead">궁금한 몸 부위나 주제를 고르세요.</p>
+  </section>
+  <div class="topic-grid">
+    {categories.map(([key, label]) => (
+      <a class="topic-card" href={`/categories/${key}/`}>
+        <strong>{label}</strong>
+        <span>{CATEGORY_DESCRIPTIONS[key]}</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

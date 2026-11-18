@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { CATEGORY_LABELS, CATEGORY_DESCRIPTIONS, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getPublishedPosts, uniqueSorted } from '../utils/posts';
+
+const posts = getPublishedPosts(await getCollection('posts'));
+const latest = posts.slice(0, 8);
+const programs = uniqueSorted(posts.map((post) => post.data.program));
+const categories = Object.entries(CATEGORY_LABELS).map(([key, label]) => ({
+  key,
+  label,
+  description: CATEGORY_DESCRIPTIONS[key],
+  count: posts.filter((post) => post.data.category === key).length
+}));
+---
+
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <section class="home-intro">
+    <h1>TV 건강 방송, 놓친 내용을<br />크고 쉽게 다시 봅니다</h1>
+    <p>생로병사의 비밀, 나는 몸신이다 같은 건강 프로그램에서 알려 준 내용을 핵심만 정리했습니다. 궁금한 곳을 골라 보세요.</p>
+    <form class="home-search" action="/search/" method="get" role="search">
+      <label class="visually-hidden" for="home-q">건강 정보 검색</label>
+      <input id="home-q" name="q" type="search" placeholder="예: 혈압, 무릎, 불면증" />
+      <button type="submit">찾기</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="category-title">
+    <div class="section-head">
+      <h2 id="category-title">어디가 궁금하세요?</h2>
+    </div>
+    <div class="topic-grid">
+      {categories.map((category) => (
+        <a class="topic-card" href={`/categories/${category.key}/`}>
+          <strong>{category.label}</strong>
+          <span>{category.count > 0 ? `${category.count}개 글` : '준비 중'}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section aria-labelledby="latest-title">
+    <div class="section-head">
+      <h2 id="latest-title">최근 방송 정리</h2>
+    </div>
+    {latest.length ? (
+      <div class="grid two">{latest.map((post) => <PostCard post={post} />)}</div>
+    ) : (
+      <p class="empty">첫 방송 정리 글을 준비하고 있습니다.</p>
+    )}
+  </section>
+
+  {programs.length > 0 && (
+    <section aria-labelledby="program-title">
+      <div class="section-head">
+        <h2 id="program-title">방송별로 보기</h2>
+        <a class="button" href="/programs/">전체 방송</a>
+      </div>
+      <ul class="chip-list">
+        {programs.map((program) => <li><a href={`/programs/#${encodeURIComponent(program)}`}>{program}</a></li>)}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

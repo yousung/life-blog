@@ -1,0 +1,25 @@
+---
+import { CATEGORY_LABELS } from '../consts';
+import { getPostDisplayDate } from '../utils/posts';
+
+const { post, compact = false } = Astro.props;
+const data = post.data;
+const href = `/posts/${data.slug}/`;
+const displayDate = getPostDisplayDate(post);
+---
+
+<article class:list={['post-card', { compact }]}>
+  <a class="card-cover" href={href} aria-label={data.title}></a>
+  {data.image && !compact && (
+    <img class="post-card-image" src={data.image} alt="" loading="lazy" decoding="async" />
+  )}
+  <div class="card-topline">
+    <span class="pill">{CATEGORY_LABELS[data.category]}</span>
+    <span>{data.program}</span>
+  </div>
+  <h2><a href={href}>{data.title}</a></h2>
+  {!compact && <p>{data.description}</p>}
+  <footer>
+    <time datetime={displayDate.date.toISOString()}>{displayDate.label} {displayDate.text}</time>
+  </footer>
+</article>

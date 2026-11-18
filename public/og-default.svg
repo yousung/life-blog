@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="방송 건강노트">
+  <rect width="1200" height="630" fill="#eef6f0"/>
+  <rect x="60" y="60" width="1080" height="510" rx="40" fill="#fff" stroke="#d9e2dc" stroke-width="4"/>
+  <rect x="120" y="150" width="140" height="140" rx="32" fill="#1f7a4d"/>
+  <path d="M190 262s-44-25.7-44-57.5c0-15.9 11.5-28.1 25.9-28.1 8.3 0 14.4 4.2 18.1 10 3.7-5.8 9.8-10 18.1-10 14.4 0 25.9 12.2 25.9 28.1 0 31.8-44 57.5-44 57.5z" fill="#fff"/>
+  <text x="300" y="250" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="92" font-weight="900" fill="#16201a">방송 건강노트</text>
+  <text x="122" y="400" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="46" font-weight="700" fill="#4a5750">TV 건강 프로그램, 큰 글씨로 쉽게 다시 보기</text>
+  <text x="122" y="480" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="36" font-weight="600" fill="#1f7a4d">혈압 · 혈당 · 관절 · 뇌 건강 · 수면 · 식단</text>
+</svg>
