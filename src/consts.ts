@@ -5,16 +5,16 @@ export const SITE_AUTHOR = 'lovizu';
 
 // Google AdSense (account pub-1322828698634218, site lovizu.com covers health.lovizu.com)
 export const ADSENSE_CLIENT = 'ca-pub-1322828698634218';
-// Google Analytics 4 — 빈 값이면 태그를 넣지 않는다. health.lovizu.com 전용 웹 스트림을 만든 뒤 채운다.
-export const GA_MEASUREMENT_ID = '';
-// Naver Analytics / Search Advisor — 빈 값이면 넣지 않는다.
-export const NAVER_ANALYTICS_ID = '';
-export const NAVER_SITE_VERIFICATION = '';
-// 광고 단위: 우선 tv 블로그 단위를 함께 쓴다(같은 계정). 전용 단위를 만들면 교체.
+// Google Analytics 4 (러비쥬 account, property p565077105 "health.lovizu.com", web stream "health.lovizu.com 웹")
+export const GA_MEASUREMENT_ID = 'G-WE3NBDXHQY';
+// Naver Analytics site "러비쥬 건강노트" / Naver Search Advisor ownership meta for https://health.lovizu.com
+export const NAVER_ANALYTICS_ID = '85cff4cc4642d8';
+export const NAVER_SITE_VERIFICATION = '261740f9e777b403fee1f09120a1749abe7dea76';
+// AdSense ad units dedicated to health (names start with "health " — per-site revenue in 광고 단위 report)
 export const AD_SLOTS = {
-  postTopDisplay: '6838397081',
-  postInArticle: '3703987348',
-  postMultiplex: '9736023163'
+  postTopDisplay: '9006207490', // "health 글 상단 디스플레이"
+  postInArticle: '8319811782', // "health 글 본문 인아티클"
+  postMultiplex: '4188995087' // "health 글 하단 멀티플렉스"
 } as const;
 
 export const NAV_ITEMS = [
