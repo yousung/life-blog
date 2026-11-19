@@ -9,10 +9,11 @@ export function getPublishedPosts(posts: Post[]) {
 }
 
 export function getPostDisplayDate(post: Post) {
-  const date = post.data.updatedDate ?? post.data.date;
+  // 목록에는 방송일을 보여준다(수정일 updatedDate는 글 본문 메타에만 표시).
+  const date = post.data.broadcastDate ?? post.data.date;
   return {
     date,
-    label: post.data.updatedDate ? '업데이트' : '작성',
+    label: '방송',
     text: new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' }).format(date)
   };
 }
